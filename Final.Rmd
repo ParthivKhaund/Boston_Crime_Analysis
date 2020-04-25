@@ -42,6 +42,17 @@ summary(crime_stats)
 crime_stats
 ```
 
+
+### Data Wrangling
+
+#### Data Cleaning
+
+```{r}
+df <- crime_stats
+df[, -c(13, 17)] 
+```
+
+
 ```{r}
 Test<-
   crime_stats%>%
