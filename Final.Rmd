@@ -1,0 +1,13 @@
+---
+title: "Boston Crime Analysis"
+output: html_notebook
+---
+
+```{r}
+data <- read.csv("crime.csv")
+```
+
+```{r}
+table(data)
+```
+
