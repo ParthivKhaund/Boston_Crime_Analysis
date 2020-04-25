@@ -16,6 +16,7 @@ rm(list = ls())
 # all packages used for the assignment
 library(mosaic)
 library(tidyverse)
+library(DataComputing)
 ```
 
 
@@ -23,6 +24,7 @@ library(tidyverse)
 
 ```{r}
 crime_stats <- read.csv("crime.csv")
+ZipGeography
 ```
 
 
