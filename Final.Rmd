@@ -16,6 +16,8 @@ rm(list = ls())
 # all packages used for the assignment
 library(mosaic)
 library(tidyverse)
+library(leaflet)
+library(DataComputing)
 ```
 
 
@@ -23,12 +25,14 @@ library(tidyverse)
 
 ```{r}
 crime_stats <- read.csv("crime.csv")
+
 ```
 
 
 #### Summary Statistics
 ```{r}
 str(crime_stats)
+str(ZipGeography)
 ```
 
 ```{r}
@@ -56,6 +60,37 @@ Test1<-
 Test1
 ```
 
+```{r}
+# top 10 criminal districs 
+distric_count<-
+  crime_stats %>%
+  group_by(DISTRICT)%>%
+  summarise(counter = n())%>%
+  arrange(desc(counter))
+
+distric_count <- distric_count[1:10,]
+distric_top_10 <- distric_count[,1]
+distric_top_10
+```
+
+```{r}
+# creating a table of just lat and long 
+lats<- 
+  crime_stats%>%
+  select(DISTRICT,Lat,Long)
+
+map <- inner_join(distric_top_10,lats)
+map <- map[1:10,]
+```
+
+```{r}
+stationMap <-
+  leaflet(map) %>%   # like ggplot()
+  addTiles() %>%          # add the map
+  addMarkers()
+
+stationMap
+```
 
 
 
