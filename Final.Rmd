@@ -23,7 +23,7 @@ library(tidyverse)
 
 ```{r}
 crime_stats <- read.csv("crime.csv")
-
+Van_crime_stats <- read.csv("Vancouver_crime_data.csv")
 ```
 
 #### Summary Statistics
@@ -47,10 +47,19 @@ crime_stats
 
 ```{r}
 df <- crime_stats
-df[, -c(13, 17)] 
+df <- df[, -c(13, 17)] 
 df[1:10,]
 
 ```
+
+```{r}
+df1 <- Van_crime_stats
+df1 <- df1[, c(1,3)] 
+df1[1:10,]
+
+
+```
+
 
 #### Count of Offence Codes
 
