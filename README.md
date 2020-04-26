@@ -1,7 +1,6 @@
 ## Welcome to Boston Crime Data Analysis
 
 ---
-title: "STAT 184 Final Project Report" 
 author: "Abhishek Raj, Sarthak Batra and Parthiv Khaund"
 output: html_notebook
 ---
