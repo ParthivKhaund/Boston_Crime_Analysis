@@ -1,12 +1,4 @@
-## Welcome to Boston Crime Data Analysis
-
----
-author: "Abhishek Raj, Sarthak Batra and Parthiv Khaund"
-output: html_notebook
----
-
-## Final Project 
-
+## Boston Crime Data Analysis
 
 ## Front Matter
 ```{r}
