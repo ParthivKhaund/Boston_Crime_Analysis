@@ -6,6 +6,54 @@ output: html_notebook
 
 ## Final Project 
 
+**(1) clearly states one guiding question or research question for your investigation**
+
+Our primary dataset is based on the crime and its various variables such as the area of the incident, type of crime, etc for the city of Boston. Using this we wish to provide a visualization tool for the law enforcement agencies of Boston where they can easily pinpoint what kind of issues an area is facing and where they need to deploy their resources.
+
+Furthermore, we wished to show how general strategies of crime management don't work as we showcase 2 cities with similar law enforcement capabilities and population but both having a high difference in there per month crime count.
+
+therefore our research questions would be : 
+
+- In which month is higher police presence needed?
+- Which crimes are most prevalent in the city?
+- In which areas and districts are there high incidences of crime?
+- which crimes occur in the most active months?
+
+
+**(2) explains why this topic is important and/or interesting to investigate**
+
+The disturbing trend of nationwide street protests and civil disobedience movements across the globe is a testimony of people's lost faith in their own chosen governments. The falling economy, failed governance, rising status inequality is increasing tension, Amidst such global unrest growing threats from terrorism, is pushing the world into despair. Stagnancy, rising income inequality, stateless immigrants, racism, and intolerance have equally contributed to the constant rise in inhumane killings, mass shooting in tough economic times.
+
+Keeping such matters in mind, our project would be beneficial for the local law enforcement as it would provide them a way not to strain the department and to efficiently deploy resources and work towards a path of minimal incidents.
+
+**(3) clearly describes one significant technical challenge encountered during the investigation and how you did or did not overcome it**
+
+During working on our report we converted a graph depicting crime type and hour of crime form narrow to wide format to showcase how each crime relates to each hour individually, however, we had to drop the table since we found that plotting a line graph for a wide table of multiple columns is not possible.so we were not able to overcome this particular challenge.
+
+**(4) explains one or more significant findings or conclusions of your investigation that is clearly related to the guiding/research question**
+
+in our report we feel all our visualisations relate to our research questions - 
+
+*In which month is higher police presence needed?
+*
+
+- we find that in most the months of July and August have the most number of incidences 
+
+*Which crimes are most prevalent in the city?
+*
+
+- we find that Motor Vehicle Accident and Larceny are the 2 most occuring crimes
+
+*which crimes occur in the most active months?
+*
+
+- in the months of July and August the most occured crime is Motor Vehicle Accident
+
+*In which areas and districts are there high incidences of crime?
+*
+
+- B2 and C11 districts have the highest cases 
+
 
 ## Front Matter
 ```{r}
@@ -89,12 +137,12 @@ total <- sum(distric_count$number_of_crimes)
 pie<-
   distric_count%>%
   mutate(percentage_of_total_crime = (number_of_crimes*100)/total)
+
 pie
-
-
   
 ```
-#### Pie chart based on the percentage of incidents for each district 
+
+## Pie chart based on the percentage of incidents for each district 
 
 ```{r}
 ggplot(data = pie ,aes(x= "" , y = percentage_of_total_crime,fill=DISTRICT))+geom_bar(stat = "identity",width=1,color="white")+coord_polar("y", start=0)
@@ -118,7 +166,7 @@ lat_long_count <- lat_long_count[-c(9),]
 lat_long_count <- lat_long_count[2:21,]
 lat_long_count
 ```
-### Leaflet for top 20 areas of Boston with highest number of incidents 
+## Leaflet for top 20 areas of Boston with highest number of incidents 
 
 ```{r}
 # code to make leafet based on our calculated table above 
@@ -130,6 +178,8 @@ boston_map <-
 
 boston_map
 ```
+
+
 ```{r}
 # code to find highest number of offence group in Boston 
 
@@ -147,6 +197,7 @@ Highest_Boston$Popularity <- ifelse(Highest_Boston$rankings > max(Highest_Boston
 Highest_Boston
 ```
 
+
 ```{r}
 # code to find to per month number of incidences in Boston
 
@@ -158,7 +209,7 @@ Boston_repeated_months<-
 
 Boston_total_crimes <- aggregate(Boston_repeated_months$n,by=list(MONTH=Boston_repeated_months$MONTH), FUN=sum)
 
-
+Boston_total_crimes
 ```
 
 ```{r}
@@ -171,14 +222,17 @@ plot<-
   select(OFFENSE_CODE_GROUP,MONTH)%>%
   count(OFFENSE_CODE_GROUP, MONTH, sort = TRUE)%>%
   filter(grepl(pattern = regex, OFFENSE_CODE_GROUP))
+
+plot
 ```
 
-### 3 variable to graph to show months with highest incidences and the types of incidences 
+## 3 variable graph to show months with highest incidences and the types of incidences 
 
 ```{r}
 ggplot(data=plot,aes(x=MONTH,y=n ,fill=OFFENSE_CODE_GROUP))+geom_bar(stat='identity',position='stack', width=.9) + scale_x_continuous(name = "Months ", breaks = c(1,2,3,4,5,6,7,8,9,10,11,12)) + scale_y_continuous(name = "Number of Crimes " , breaks = c(0,5000,10000,15000,20000))
 
 ```
+
 ```{r}
 # code to find to per month number of incidences in Boston
 
@@ -191,6 +245,7 @@ Vancouver_repeated_months<-
 
 Vancouver_total_crimes <- aggregate(Vancouver_repeated_months$n, by=list(MONTH=Vancouver_repeated_months$MONTH), FUN=sum)
 
+Vancouver_total_crimes
 ```
 
 ```{r}
@@ -204,9 +259,11 @@ crimes_list<-left_join(Vancouver_total_crimes,Boston_total_crimes,by="MONTH")
 plot<-
   crimes_list%>%
   rename(vancouver_crime = x.x,boston_crime = x.y)
+
+plot
 ```
 
-### Multiple Geom plot to compare boston incidences per month with Vancouver 
+## Multiple Geom plot to compare boston incidences per month with Vancouver 
 
 ```{r}
 ggplot(plot)+
