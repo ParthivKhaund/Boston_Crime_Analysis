@@ -34,14 +34,23 @@ Van_crime_stats <- read.csv("Vancouver_crime_data.csv")
 ```{r}
 str(crime_stats)
 ```
-
 ```{r}
-summary(crime_stats)
+str(Van_crime_stats)
 ```
 
 
 ```{r}
+summary(crime_stats)
+```
+```{r}
+summary(Van_crime_stats)
+```
+
+```{r}
 crime_stats
+```
+```{r}
+Van_crime_stats
 ```
 
 
@@ -103,11 +112,15 @@ Test
 ```
 
 ```{r}
+regex <- "MOTORCYCLE|SCOOTER|LEASED|RENTED VEHICLE"
 Test1<-
-  crime_stats%>%
+  df%>%
   select(OFFENSE_CODE_GROUP,OFFENSE_DESCRIPTION)%>%
-  filter(OFFENSE_CODE_GROUP == "Auto Theft")
+  filter(OFFENSE_CODE_GROUP == "Auto Theft")%>%
+  filter(grepl(pattern = regex, OFFENSE_DESCRIPTION))
 Test1
+
+
 ```
 
 ```{r}
@@ -143,7 +156,7 @@ lat_long_count<-
 
 lat_long_count <- lat_long_count[-c(9),] 
 lat_long_count <- lat_long_count[2:21,]
-lat_long_count
+lat_long_countf
 ```
 
 ```{r}
@@ -151,10 +164,16 @@ lat_long_count
 stationMap <-
   leaflet(lat_long_count) %>%   # like ggplot()
   addTiles() %>%          # add the map
-  addMarkers()
+  addMarkers(clusterOptions = markerClusterOptions())
 
 stationMap
 ```
+
+
+```{r}
+
+```
+
 
 #### Describe preliminary observations and intuition about the research question
 
@@ -168,6 +187,7 @@ Based on a preliminary observation from the graph we find that some months have 
 The primary data that we will use is from https://www.kaggle.com/ankkur13/boston-crime-data 
 
 #### Other data sources
+
 
 ZipGeography is an another data source that we are planning to use.
 
