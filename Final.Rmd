@@ -17,7 +17,9 @@ rm(list = ls())
 library(mosaic)
 library(tidyverse)
 library(leaflet)
-library(DataComputing)
+library(ggplot2)
+library(ggExtra)
+
 ```
 
 
@@ -32,7 +34,6 @@ crime_stats <- read.csv("crime.csv")
 #### Summary Statistics
 ```{r}
 str(crime_stats)
-str(ZipGeography)
 ```
 
 ```{r}
@@ -61,38 +62,50 @@ Test1
 ```
 
 ```{r}
-# top 10 criminal districs 
+# top criminal districs 
 distric_count<-
   crime_stats %>%
   group_by(DISTRICT)%>%
+  summarise(number_of_crimes = n())%>%
+  arrange(desc(number_of_crimes))
+
+distric_count <- distric_count[1:12,]
+
+total <- sum(distric_count$number_of_crimes)
+
+pie<-
+  distric_count%>%
+  mutate(percentage_of_total_crime = (number_of_crimes*100)/total)
+pie
+  
+```
+
+```{r}
+ggplot(data = pie ,aes(x= "" , y = percentage_of_total_crime,fill=DISTRICT))+geom_bar(stat = "identity",width=1,color="white")+coord_polar("y", start=0)
+```
+
+```{r}
+# top 10 criminal latitude longitude 
+lat_long_count<-
+  crime_stats %>%
+  group_by(Lat,Long)%>%
   summarise(counter = n())%>%
   arrange(desc(counter))
 
-distric_count <- distric_count[1:10,]
-distric_top_10 <- distric_count[,1]
-distric_top_10
+lat_long_count <- lat_long_count[-c(9),] 
+lat_long_count <- lat_long_count[2:21,]
+lat_long_count
 ```
 
 ```{r}
-# creating a table of just lat and long 
-lats<- 
-  crime_stats%>%
-  select(DISTRICT,Lat,Long)
-
-map <- inner_join(distric_top_10,lats)
-map <- map[1:10,]
-```
-
-```{r}
+# top 20 criminal areas 
 stationMap <-
-  leaflet(map) %>%   # like ggplot()
+  leaflet(lat_long_count) %>%   # like ggplot()
   addTiles() %>%          # add the map
   addMarkers()
 
 stationMap
 ```
-
-
 
 #### Describe preliminary observations and intuition about the research question
 
