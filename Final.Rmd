@@ -1,9 +1,8 @@
 ---
-title: "STAT 184 Final Project Preliminary EDA" 
+title: "STAT 184 Final Project Report" 
 author: "Abhishek Raj, Sarthak Batra and Parthiv Khaund"
 output: html_notebook
 ---
-
 
 ## Final Project 
 
@@ -18,7 +17,6 @@ library(mosaic)
 library(tidyverse)
 library(leaflet)
 library(ggplot2)
-
 ```
 
 
@@ -37,205 +35,184 @@ str(crime_stats)
 ```{r}
 str(Van_crime_stats)
 ```
-
-
 ```{r}
 summary(crime_stats)
 ```
 ```{r}
 summary(Van_crime_stats)
 ```
-
 ```{r}
 crime_stats
 ```
 ```{r}
 Van_crime_stats
 ```
-
-
 ### Data Wrangling
 
 #### Data Cleaning
 
 ```{r}
+# clean up data that acts as an outlier (error in data)
+
 df <- crime_stats
 df <- df[, -c(13, 17)] 
-df[1:10,]
-
 ```
 
 ```{r}
+# creating a new dataframe for only the 2 required columns from the 2nd database 
+
 df1 <- Van_crime_stats
 df1 <- df1[, c(1,3)] 
-df1[1:10,]
-
-
 ```
 
-#### Number of offence in Month
+#### Districts with the total percentage of crime & total number of crime 
 
 ```{r}
-Month<-
-  df%>%
-  select(OFFENSE_CODE_GROUP,MONTH)%>%
-  count(OFFENSE_CODE_GROUP, MONTH, sort = TRUE)%>%
-  select(MONTH,n)
-Month
+# code to find districts based on most number fo incidents 
 
-BarTest <- aggregate(Month$n, by=list(MONTH=Month$MONTH), FUN=sum)
-BarTest
-```
-
-```{r}
-Mon<-
-  df%>%
-  select(OFFENSE_CODE_GROUP,MONTH)%>%
-  count(OFFENSE_CODE_GROUP, MONTH, sort = TRUE)%>%
-  filter(OFFENSE_CODE_GROUP == "Motor Vehicle Accident Response"|OFFENSE_CODE_GROUP == "Larceny"|OFFENSE_CODE_GROUP == "Medical Assistance	"|OFFENSE_CODE_GROUP == "Investigate Person"|OFFENSE_CODE_GROUP == "Other"|OFFENSE_CODE_GROUP == "Drug Violation"|OFFENSE_CODE_GROUP == "Simple Assault"|OFFENSE_CODE_GROUP == "Vandalism"|OFFENSE_CODE_GROUP == "Verbal Disputes"|OFFENSE_CODE_GROUP == "Towed")
-Mon
-
-```
-
-```{r}
-ggplot(data=Mon,aes(x=MONTH,y=n ,fill=OFFENSE_CODE_GROUP))+geom_bar(stat='identity',position='stack', width=.9)+scale_fill_brewer(type='div',palette=1) + scale_x_continuous(name = "Months ", breaks = c(1,2,3,4,5,6,7,8,9,10,11,12)) + scale_y_continuous(name = "Number of Crimes " , breaks = c(5000,10000,15000,20000))
-
-```
-
-#### Count of Offence Codes
-```{r}
-Test<-
-  crime_stats%>%
-  select(OFFENSE_CODE_GROUP)%>%
-  count(OFFENSE_CODE_GROUP, sort = TRUE)
-Test
-```
-
-```{r}
-regex <- "MOTORCYCLE|SCOOTER|LEASED|RENTED VEHICLE"
-Test1<-
-  df%>%
-  select(OFFENSE_CODE_GROUP,OFFENSE_DESCRIPTION)%>%
-  filter(OFFENSE_CODE_GROUP == "Auto Theft")%>%
-  filter(grepl(pattern = regex, OFFENSE_DESCRIPTION))
-Test1
-
-
-```
-
-```{r}
-# top criminal districs 
 distric_count<-
   crime_stats %>%
   group_by(DISTRICT)%>%
   summarise(number_of_crimes = n())%>%
   arrange(desc(number_of_crimes))
 
+# selecting top 12 districts based on number of incidents 
+
 distric_count <- distric_count[1:12,]
 
+# calculating the toal number of incidents 
+
 total <- sum(distric_count$number_of_crimes)
+
+# creating a pie chart based on the percentage of incidents for each district  
 
 pie<-
   distric_count%>%
   mutate(percentage_of_total_crime = (number_of_crimes*100)/total)
 pie
+
+
   
 ```
+#### Pie chart based on the percentage of incidents for each district 
 
 ```{r}
 ggplot(data = pie ,aes(x= "" , y = percentage_of_total_crime,fill=DISTRICT))+geom_bar(stat = "identity",width=1,color="white")+coord_polar("y", start=0)
 ```
 
 ```{r}
-# top 10 criminal latitude longitude 
+# top 10 latitudes & longitudes based on number on incidents 
+
 lat_long_count<-
   crime_stats %>%
   group_by(Lat,Long)%>%
   summarise(counter = n())%>%
   arrange(desc(counter))
 
+# removing an outlier longitude 
+
 lat_long_count <- lat_long_count[-c(9),] 
+
+# taking top 20 values based on number of incidents 
+
 lat_long_count <- lat_long_count[2:21,]
-lat_long_countf
+lat_long_count
 ```
+### Leaflet for top 20 areas of Boston with highest number of incidents 
 
 ```{r}
-# top 20 criminal areas 
-stationMap <-
+# code to make leafet based on our calculated table above 
+
+boston_map <-
   leaflet(lat_long_count) %>%   # like ggplot()
   addTiles() %>%          # add the map
   addMarkers(clusterOptions = markerClusterOptions())
 
-stationMap
-```
-
-<<<<<<< HEAD
-
-```{r}
-
-```
-
-
-||||||| merged common ancestors
-=======
-
-```{r}
-TestVan<-
-  df1%>%
-  select(TYPE)%>%
-  count(TYPE, sort = TRUE)
-TestVan[1:10,]
-
+boston_map
 ```
 ```{r}
+# code to find highest number of offence group in Boston 
 
-Month1<-
-  df1%>%
-  select(TYPE,MONTH)%>%
-  count(TYPE, MONTH, sort = TRUE)%>%
+Highest_Boston<-
+  df%>%
+  select(OFFENSE_CODE_GROUP)%>%
+  group_by(OFFENSE_CODE_GROUP)%>%
+  summarise(count = n())%>%
+  mutate(rankings = rank(count))%>%
+  arrange(desc(count))
+
+# Using Control-Flow to rate the top 10 offense types
+
+Highest_Boston$Popularity <- ifelse(Highest_Boston$rankings > max(Highest_Boston$rankings) - 10, "Top_10", "Below")
+Highest_Boston
+```
+
+```{r}
+# code to find to per month number of incidences in Boston
+
+Boston_repeated_months<-
+  df%>%
+  select(OFFENSE_CODE_GROUP,MONTH)%>%
+  count(OFFENSE_CODE_GROUP, MONTH, sort = TRUE)%>%
   select(MONTH,n)
-Month1
 
-BarTest1 <- aggregate(Month1$n, by=list(MONTH=Month1$MONTH), FUN=sum)
-BarTest1
+Boston_total_crimes <- aggregate(Boston_repeated_months$n,by=list(MONTH=Boston_repeated_months$MONTH), FUN=sum)
+
 
 ```
 
 ```{r}
-Mon1<-
+# using the top 10 in highest_boston for Regex
+
+regex <- "Motor Vehicle Accident Response|Larceny|Medical Assistance|Investigate Person|Other|Drug Violation|Simple Assault|Vandalism|Verbal Disputes|Towed"
+
+plot<-
+  df%>%
+  select(OFFENSE_CODE_GROUP,MONTH)%>%
+  count(OFFENSE_CODE_GROUP, MONTH, sort = TRUE)%>%
+  filter(grepl(pattern = regex, OFFENSE_CODE_GROUP))
+```
+
+### 3 variable to graph to show months with highest incidences and the types of incidences 
+
+```{r}
+ggplot(data=plot,aes(x=MONTH,y=n ,fill=OFFENSE_CODE_GROUP))+geom_bar(stat='identity',position='stack', width=.9) + scale_x_continuous(name = "Months ", breaks = c(1,2,3,4,5,6,7,8,9,10,11,12)) + scale_y_continuous(name = "Number of Crimes " , breaks = c(0,5000,10000,15000,20000))
+
+```
+```{r}
+# code to find to per month number of incidences in Boston
+
+Vancouver_repeated_months<-
   df1%>%
   select(TYPE,MONTH)%>%
   count(TYPE, MONTH, sort = TRUE)%>%
-  filter(TYPE == "Theft from Vehicle"|TYPE == "Mischief"|TYPE == "Break and Enter Residential/Other"|TYPE == "Offence Against a Person"|TYPE == "Other Theft"|TYPE == "Theft of Vehicle"|TYPE == "Break and Enter Commercial"|TYPE == "Theft of Bicycle"|TYPE == "Vehicle Collision or Pedestrian Struck (with Injury)"|TYPE == "Vehicle Collision or Pedestrian Struck (with Fatality)")
-Mon1
-```
+  select(MONTH,n)%>%
+  arrange(desc(n))
 
+Vancouver_total_crimes <- aggregate(Vancouver_repeated_months$n, by=list(MONTH=Vancouver_repeated_months$MONTH), FUN=sum)
+
+```
 
 ```{r}
-Mon%>% 
-  ggplot(aes(x = MONTH, y=n)) +
-  geom_bar(stat = "identity", fill="gray", width=0.9) +
-  geom_point(data = Mon1, aes(x=MONTH, y=n)) + 
-  theme(axis.text.x = element_text(angle = 30, hjust=1))+
-  scale_x_continuous(name = "Months ", breaks = c(1,2,3,4,5,6,7,8,9,10,11,12)) +
-  scale_y_continuous(name = "Number of Crimes " , breaks = c(5000,10000,15000,20000))
+# joining Vancouver and Boston per month incidences sets 
 
+crimes_list<-left_join(Vancouver_total_crimes,Boston_total_crimes,by="MONTH")
 ```
 
->>>>>>> 3860bdc1d16ff5e44c030e65f82960225dbfb694
-#### Describe preliminary observations and intuition about the research question
+```{r}
+# code to create Multiple Geom plot to compare boston incidences per month with Vancouver 
+plot<-
+  crimes_list%>%
+  rename(vancouver_crime = x.x,boston_crime = x.y)
+```
 
-Based on a preliminary observation from the graph we find that some months have more crime in a reported area.
+### Multiple Geom plot to compare boston incidences per month with Vancouver 
 
+```{r}
+ggplot(plot)+
+  geom_col(aes(x = MONTH, y = vancouver_crime), size = 1, color = "white", fill = "black") +
+  geom_line(aes(x = MONTH, y = boston_crime), size = 1.5, color="lightgreen", group = 1) + scale_x_continuous(name = "Months ", breaks = c(1,2,3,4,5,6,7,8,9,10,11,12)) +
+  scale_y_continuous(name = "Number of Crimes " , breaks = c(5000,10000,15000,20000,25000,30000,35000,40000,45000))
+```
 
-### TWO Data Sources
-
-#### Primary Data
-
-The primary data that we will use is from https://www.kaggle.com/ankkur13/boston-crime-data 
-
-#### Other data sources
-
-
-ZipGeography is an another data source that we are planning to use.
 
