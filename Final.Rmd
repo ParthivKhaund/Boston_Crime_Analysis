@@ -169,12 +169,60 @@ stationMap <-
 stationMap
 ```
 
+<<<<<<< HEAD
 
 ```{r}
 
 ```
 
 
+||||||| merged common ancestors
+=======
+
+```{r}
+TestVan<-
+  df1%>%
+  select(TYPE)%>%
+  count(TYPE, sort = TRUE)
+TestVan[1:10,]
+
+```
+```{r}
+
+Month1<-
+  df1%>%
+  select(TYPE,MONTH)%>%
+  count(TYPE, MONTH, sort = TRUE)%>%
+  select(MONTH,n)
+Month1
+
+BarTest1 <- aggregate(Month1$n, by=list(MONTH=Month1$MONTH), FUN=sum)
+BarTest1
+
+```
+
+```{r}
+Mon1<-
+  df1%>%
+  select(TYPE,MONTH)%>%
+  count(TYPE, MONTH, sort = TRUE)%>%
+  filter(TYPE == "Theft from Vehicle"|TYPE == "Mischief"|TYPE == "Break and Enter Residential/Other"|TYPE == "Offence Against a Person"|TYPE == "Other Theft"|TYPE == "Theft of Vehicle"|TYPE == "Break and Enter Commercial"|TYPE == "Theft of Bicycle"|TYPE == "Vehicle Collision or Pedestrian Struck (with Injury)"|TYPE == "Vehicle Collision or Pedestrian Struck (with Fatality)")
+Mon1
+```
+
+
+```{r}
+Mon%>% 
+  ggplot(aes(x = MONTH, y=n)) +
+  geom_bar(stat = "identity", fill="gray", width=0.9) +
+  geom_point(data = Mon1, aes(x=MONTH, y=n)) + 
+  theme(axis.text.x = element_text(angle = 30, hjust=1))+
+  scale_x_continuous(name = "Months ", breaks = c(1,2,3,4,5,6,7,8,9,10,11,12)) +
+  scale_y_continuous(name = "Number of Crimes " , breaks = c(5000,10000,15000,20000))
+
+```
+
+>>>>>>> 3860bdc1d16ff5e44c030e65f82960225dbfb694
 #### Describe preliminary observations and intuition about the research question
 
 Based on a preliminary observation from the graph we find that some months have more crime in a reported area.
