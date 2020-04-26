@@ -16,10 +16,8 @@ rm(list = ls())
 # all packages used for the assignment
 library(mosaic)
 library(tidyverse)
-library(leaflet)
-library(DataComputing)
-```
 
+```
 
 #### Loading Data
 
@@ -28,11 +26,9 @@ crime_stats <- read.csv("crime.csv")
 
 ```
 
-
 #### Summary Statistics
 ```{r}
 str(crime_stats)
-str(ZipGeography)
 ```
 
 ```{r}
@@ -44,55 +40,85 @@ summary(crime_stats)
 crime_stats
 ```
 
+
+### Data Wrangling
+
+#### Data Cleaning
+
+```{r}
+df <- crime_stats
+df[, -c(13, 17)] 
+df[1:10,]
+
+```
+
+#### Count of Offence Codes
+
 ```{r}
 Test<-
-  crime_stats%>%
+  df%>%
   select(OFFENSE_CODE_GROUP)%>%
-  count(OFFENSE_CODE_GROUP, sort = TRUE)
+  count(OFFENSE_CODE_GROUP, sort = TRUE)%>%
+  head(10)
 Test
 ```
 
+#### Number of offence in Month
+
 ```{r}
+Month<-
+  df%>%
+  select(OFFENSE_CODE_GROUP,MONTH)%>%
+  count(OFFENSE_CODE_GROUP, MONTH, sort = TRUE)%>%
+  select(MONTH,n)
+Month
+
+BarTest <- aggregate(Month$n, by=list(MONTH=Month$MONTH), FUN=sum)
+BarTest
+
+```
+
+
+
+```{r}
+Mon<-
+  df%>%
+  select(OFFENSE_CODE_GROUP,MONTH)%>%
+  count(OFFENSE_CODE_GROUP, MONTH, sort = TRUE)%>%
+  filter(OFFENSE_CODE_GROUP == "Motor Vehicle Accident Response"|OFFENSE_CODE_GROUP == "Larceny"|OFFENSE_CODE_GROUP == "Medical Assistance"|OFFENSE_CODE_GROUP == "Investigate Person"|OFFENSE_CODE_GROUP == "Other"|OFFENSE_CODE_GROUP == "Drug Violation"|OFFENSE_CODE_GROUP == "Simple Assault"|OFFENSE_CODE_GROUP == "Vandalism"|OFFENSE_CODE_GROUP == "Verbal Disputes"|OFFENSE_CODE_GROUP == "Towed")
+Mon
+
+
+
+```
+
+
+
+
+
+
+```{r}
+ggplot(data=Mon,aes(x=MONTH,y=n ,fill=OFFENSE_CODE_GROUP))+geom_bar(stat='identity',position='stack', width=.9)+scale_fill_brewer(type='div',palette=1) + scale_x_continuous(name = "Months ", breaks = c(1,2,3,4,5,6,7,8,9,10,11,12)) + scale_y_continuous(name = "Number of Crimes " , breaks = c(5000,10000,15000,20000))
+
+```
+
+#### Trying Regex to find Auto Theft with description
+
+```{r}
+regex <- "MOTORCYCLE|SCOOTER|LEASED|RENTED VEHICLE"
 Test1<-
-  crime_stats%>%
+  df%>%
   select(OFFENSE_CODE_GROUP,OFFENSE_DESCRIPTION)%>%
-  filter(OFFENSE_CODE_GROUP == "Auto Theft")
+  filter(OFFENSE_CODE_GROUP == "Auto Theft")%>%
+  filter(grepl(pattern = regex, OFFENSE_DESCRIPTION))
 Test1
+
 ```
 
 ```{r}
-# top 10 criminal districs 
-distric_count<-
-  crime_stats %>%
-  group_by(DISTRICT)%>%
-  summarise(counter = n())%>%
-  arrange(desc(counter))
 
-distric_count <- distric_count[1:10,]
-distric_top_10 <- distric_count[,1]
-distric_top_10
+
 ```
-
-```{r}
-# creating a table of just lat and long 
-lats<- 
-  crime_stats%>%
-  select(DISTRICT,Lat,Long)
-
-map <- inner_join(distric_top_10,lats)
-map <- map[1:10,]
-```
-
-```{r}
-stationMap <-
-  leaflet(map) %>%   # like ggplot()
-  addTiles() %>%          # add the map
-  addMarkers()
-
-stationMap
-```
-
-
 
 #### Describe preliminary observations and intuition about the research question
 
@@ -108,4 +134,3 @@ The primary data that we will use is from https://www.kaggle.com/ankkur13/boston
 #### Other data sources
 
 ZipGeography is an another data source that we are planning to use.
-
