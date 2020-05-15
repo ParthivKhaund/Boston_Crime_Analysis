@@ -1,2 +1,2 @@
 ## Boston Crime Data Analysis
-<a href = "sample">REPORT</a>
+<a href = "https://parthivkhaund.github.io/Boston_Crime_Analysis/">REPORT</a>
